@@ -1,11 +1,11 @@
 {
-	"name": "HardStuff_pio_bricks_OTAGH",
+	"name": "OTA-Hub-github-device_client",
 	"version": "0.0.1",
-	"description": "Client-side code for running device updates via OTA Hub (by Hard Stuff).",
+	"description": "Client-side code for running device updates via GitHub (by OTA Hub (by Hard Stuff)).",
 	"keywords": "http, ota, ota-hub",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Matt-Stedman-HardStuff/HardStuff_pio_bricks_OTAGH.git"
+		"url": "https://github.com/Hard-Stuff/OTA-Hub-github-piolib-device_client.git"
 	},
 	"authors": [
 		{
@@ -17,8 +17,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"paulstoffregen/Time": "^1.6.1",
-		"bblanchon/ArduinoJson": "^7.0.0",
-        "HardStuff_pio_lib_Http": "git@github.com:Hard-Stuff/HardStuff_pio_lib_Http.git"
+		"bblanchon/ArduinoJson": "^7.0.0"
 	},
 	"frameworks": "*",
 	"platforms": "*"
