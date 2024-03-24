@@ -1,8 +1,8 @@
 {
 	"name": "OTA-Hub-diy-device_client",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Client-side code for running Do-It-Yourself device updates via GitHub, by OTA Hub.",
-	"keywords": "http, ota, ota-hub",
+	"keywords": "http, ota, ota-hub, github",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Hard-Stuff/OTA-Hub-diy-piolib-device_client.git"
@@ -18,7 +18,7 @@
 	"dependencies": {
 		"bblanchon/ArduinoJson": "^7.0.0",
 		"paulstoffregen/Time": "^1.6.1",
-		"hard-stuff/Http": "^0.0.1"
+		"hard-stuff/Http": "^0.0.2"
 	},
 	"frameworks": "*",
 	"platforms": "*"
