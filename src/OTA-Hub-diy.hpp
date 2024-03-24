@@ -1,5 +1,6 @@
 #pragma once
-#define HTTP_MAX_HEADERS 30 // GitHub sends ~28 headers back!
+#define HTTP_MAX_HEADERS 30          // GitHub sends ~28 headers back!
+SET_LOOP_TASK_STACK_SIZE(16 * 1024); // 16KB, GitHub responses are heavy
 
 // libs
 #include <HardStuff-piolib-Http.hpp>
@@ -11,7 +12,7 @@
 #include <ota-github-cacerts.h>
 
 #ifndef OTA_VERSION
-#define OTA_VERSION "no_version"
+#define OTA_VERSION "local_development"
 #endif
 
 #pragma region HelperFunctions
