@@ -1,6 +1,5 @@
 #pragma once
-#define HTTP_MAX_HEADERS 30
-// SET_LOOP_TASK_STACK_SIZE(16 * 1024); // 16KB // TODO: this might be needed!
+#define HTTP_MAX_HEADERS 30 // GitHub sends ~28 headers back!
 
 // libs
 #include <HardStuff-piolib-Http.hpp>
@@ -58,21 +57,30 @@ namespace OTA
 #pragma endregion
 
 #pragma region UsefulStructs
+    /**
+     * @brief What is the condition of the update relative to the current installed firmware?
+     */
     enum UpdateCondition
     {
-        NO_UPDATE,
-        OLD_DIFFERENT,
-        NEW_DIFFERENT,
-        NEW_SAME
+        NO_UPDATE,     // The proposed release is the same name and same age as this one (i.e. they're the same)
+        OLD_DIFFERENT, // The proposed release is different to what we've got here (but it's older)
+        NEW_SAME,      // The proposed release is newer but has the same name as this one (are you versioning correctly?)
+        NEW_DIFFERENT  // The proposed update is both newer and has a different name (so is likely to be a legitimate update)
     };
 
+    /**
+     * @brief What is the condition of the install?
+     */
     enum InstallCondition
     {
-        FAILED_TO_DOWNLOAD,
-        REDIRECT_REQUIRED,
-        SUCCESS
+        FAILED_TO_DOWNLOAD, // For whatever reason, we failed to download the update
+        REDIRECT_REQUIRED,  // We'll need to follow a redirect to download the firmware.bin file. Don't forget to set to the new ca_cert!
+        SUCCESS             // Success! You'll likely only see me if you've asked the installer to not restart the ESP32.
     };
 
+    /**
+     * @brief Everything necesary related to a firmware release
+     */
     struct UpdateObject
     {
         UpdateCondition condition;
@@ -102,8 +110,57 @@ namespace OTA
     };
 #pragma endregion
 
+#pragma region SupportFunctions
+    void confirmConnected()
+    {
+        if (http_ota->connected())
+        {
+        }
+    }
+
+    void printFirmwareDetails(Stream *print_stream = &Serial)
+    {
+        print_stream->println("------------------------");
+        print_stream->println("Device MAC: " + getMacAddress());
+        print_stream->println("Firmware Version: " + (String)OTA_VERSION);
+        print_stream->println("Firmware Compilation Date: " + (String)__DATE__ + ", " + (String)__TIME__);
+        print_stream->println("------------------------");
+    }
+
+    void deinit()
+    {
+        if (http_ota != nullptr)
+        {
+            http_ota->stop();
+            delete http_ota;
+            http_ota = nullptr;
+        }
+    }
+
+    void reinit(Client &set_underlying_client, const char *server, uint16_t port)
+    {
+        deinit();
+        Serial.print("Server: ");
+        Serial.println(server);
+        underlying_client = &set_underlying_client;
+        http_ota = new HardStuffHttpClient(set_underlying_client, server, port);
+    }
+
+    void init(Client &set_underlying_client)
+    {
+        printFirmwareDetails();
+        reinit(set_underlying_client, OTAGH_SERVER, OTAGH_PORT);
+    }
+
+#pragma endregion
+
 #pragma region CoreFunctions
 
+    /**
+     * @brief Check GitHub to see if an update is available
+     *
+     * @return UpdateObject that bundles all the info we'll need.
+     */
     UpdateObject isUpdateAvailable()
     {
         UpdateObject return_object;
@@ -113,7 +170,7 @@ namespace OTA
         HardStuffHttpRequest request;
         request.addHeader("Accept", "application/vnd.github+json");
 #ifdef OTAGH_BEARER
-        request.addHeader("Authorization", "Bearer " + String(OTAGH_BEARER));
+        request.addHeader("Authorization", "Bearer " + String(OTAGH_BEARER)); // Used only in private repos. See the docs.
 #endif
 
         HardStuffHttpResponse response = http_ota->getFromHTTPServer(String(OTAGH_CHECK_PATH), &request);
@@ -157,6 +214,13 @@ namespace OTA
         return return_object;
     }
 
+    /**
+     * @brief Download and perform an update based on the details provided in the UpdateObject file.
+     *
+     * @param details You'll get this from `isUpdateAvailable`
+     * @param restart You can stop the updater from automatically restarting the board, say if you need to wind things down a bit...
+     * @return InstallCondition Was it a success?
+     */
     InstallCondition performUpdate(UpdateObject *details, bool restart = true)
     {
         Serial.println("Fetching update from: " + (details->redirect_server.isEmpty() ? String(OTAGH_SERVER) : details->redirect_server) + details->firmware_asset_endpoint);
@@ -231,14 +295,15 @@ namespace OTA
                     Update.writeStream(*http_ota);
                     if (Update.end())
                     {
-                        Serial.println("OTA done!");
                         if (Update.isFinished())
                         {
+                            Serial.println("OTA done!");
                             if (restart)
                             {
                                 Serial.println("Reboot...");
                                 ESP.restart();
                             }
+                            http_ota->stop();
                             return SUCCESS;
                         }
                     }
@@ -260,52 +325,14 @@ namespace OTA
         http_ota->stop();
         return FAILED_TO_DOWNLOAD;
     }
-#pragma endregion
 
-#pragma region SupportFunctions
-    void confirmConnected()
-    {
-        if (http_ota->connected())
-        {
-        }
-    }
-
-    void printFirmwareDetails(Stream *print_stream = &Serial)
-    {
-        print_stream->println("------------------------");
-        print_stream->println("Device MAC: " + getMacAddress());
-        print_stream->println("Firmware Version: " + (String)OTA_VERSION);
-        print_stream->println("Firmware Compilation Date: " + (String)__DATE__ + ", " + (String)__TIME__);
-        print_stream->println("------------------------");
-    }
-
-    void reinit(Client &set_underlying_client, const char *server, uint16_t port)
-    {
-        Serial.print("Server: ");
-        Serial.println(server);
-        underlying_client = &set_underlying_client;
-        http_ota = new HardStuffHttpClient(set_underlying_client, server, port);
-    }
-
-    void init(Client &set_underlying_client)
-    {
-        printFirmwareDetails();
-        reinit(set_underlying_client, OTAGH_SERVER, OTAGH_PORT);
-    }
-
-    void deinit()
-    {
-        if (http_ota != nullptr)
-        {
-            http_ota->stop();
-            delete http_ota;
-            http_ota = nullptr;
-        }
-    }
-
+    /**
+     * @brief Continue with an update (likely modified) following a 302 redirect.
+     * Behaves similar to performUpdate, but is used after defining new SSL certs as needed.
+     * @return InstallCondition
+     */
     InstallCondition continueRedirect(UpdateObject *details, bool restart = true)
     {
-        deinit();
         reinit(*underlying_client, details->redirect_server.c_str(), OTAGH_PORT);
         return performUpdate(details, restart);
     }

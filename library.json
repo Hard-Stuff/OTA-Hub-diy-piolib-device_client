@@ -1,23 +1,24 @@
 {
-	"name": "OTA-Hub-github-device_client",
+	"name": "OTA-Hub-diy-device_client",
 	"version": "0.0.1",
-	"description": "Client-side code for running device updates via GitHub (by OTA Hub (by Hard Stuff)).",
+	"description": "Client-side code for running Do-It-Yourself device updates via GitHub, by OTA Hub.",
 	"keywords": "http, ota, ota-hub",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Hard-Stuff/OTA-Hub-github-piolib-device_client.git"
+		"url": "https://github.com/Hard-Stuff/OTA-Hub-diy-piolib-device_client.git"
 	},
 	"authors": [
 		{
 			"name": "Matt Stedman",
-			"email": "matt@hard-stuff.com",
+			"email": "ota-hub@hard-stuff.com",
 			"url": "https://hard-stuff.com"
 		}
 	],
 	"license": "MIT",
 	"dependencies": {
+		"bblanchon/ArduinoJson": "^7.0.0",
 		"paulstoffregen/Time": "^1.6.1",
-		"bblanchon/ArduinoJson": "^7.0.0"
+		"HardStuff-piolib-Http": "git@github.com:Hard-Stuff/HardStuff-piolib-Http.git"
 	},
 	"frameworks": "*",
 	"platforms": "*"
