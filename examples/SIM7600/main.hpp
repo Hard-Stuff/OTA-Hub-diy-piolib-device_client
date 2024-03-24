@@ -2,12 +2,12 @@
 
 // OTA Hub via GitHub
 #define OTAGH_OWNER_NAME "Hard-Stuff"
-#define OTAGH_REPO_NAME "test-ota"
+#define OTAGH_REPO_NAME "OTA-Hub-diy-example_project"
 #define OTAGH_BEARER "YOUR PRIVATE REPO TOKEN" // Follow the docs if using a private repo.
 #include <OTA-Hub-diy.hpp>
 
 #define SIM7600_APN "Three" // Your SIM's APN
-#include <HardStuff-piolib-SIM7600.hpp>
+#include <Hard-Stuff-SIM7600.hpp>
 SIM7600::ClientSecure secure_client(0);
 
 void setup()

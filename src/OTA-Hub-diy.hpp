@@ -3,7 +3,7 @@
 SET_LOOP_TASK_STACK_SIZE(16 * 1024); // 16KB, GitHub responses are heavy
 
 // libs
-#include <HardStuff-piolib-Http.hpp>
+#include <Hard-Stuff-Http.hpp>
 #include <Update.h>
 #include <ArduinoJson.h>
 #include <TimeLib.h>

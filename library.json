@@ -18,7 +18,7 @@
 	"dependencies": {
 		"bblanchon/ArduinoJson": "^7.0.0",
 		"paulstoffregen/Time": "^1.6.1",
-		"HardStuff-piolib-Http": "git@github.com:Hard-Stuff/HardStuff-piolib-Http.git"
+		"hard-stuff/Http": "^0.0.1"
 	},
 	"frameworks": "*",
 	"platforms": "*"
