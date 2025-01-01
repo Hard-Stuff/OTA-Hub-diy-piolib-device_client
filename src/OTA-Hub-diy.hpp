@@ -209,6 +209,7 @@ namespace OTA
                 }
             }
             Serial.println("The latest release contains no firmware asset. We can't continue...");
+            return return_object;
         }
 
         Serial.println("Failed to connect to GitHub. Check your OTAGH_... #defines.");
