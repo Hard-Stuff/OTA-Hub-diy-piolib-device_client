@@ -96,8 +96,8 @@ namespace OTA
             const char *condition_strings[] = {
                 "NO_UPDATE",
                 "OLD_DIFFERENT",
-                "NEW_DIFFERENT",
-                "NEW_SAME"};
+                "NEW_SAME",
+                "NEW_DIFFERENT"};
 
             // Print condition
             print_stream->println("------------------------");
