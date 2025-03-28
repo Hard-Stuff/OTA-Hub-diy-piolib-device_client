@@ -59,6 +59,7 @@ void setup()
     }
 
     // Initialise OTA
+    // wifi_client.setInsecure(); // if you're worried about expiring CA certs and you don't need to validate SSL
     wifi_client.setCACert(OTAGH_CA_CERT); // Set the api.github.cm SSL cert on the WiFi Client
     OTA::init(wifi_client);
 
@@ -118,7 +119,15 @@ static const char OTAGH_REDIRECT_CA_CERT[]; // CA Cert for GitHub's objects.gith
 
 -   arduino-libraries/ArduinoHttpClient
 -   paulstoffregen/Time
--   [HardStuff-piolib-Http](https://github.com/Hard-Stuff/HardStuff-piolib-Http)
+-    [hard-stuff/Http](https://registry.platformio.org/libraries/hard-stuff/Http)
+
+### Note on CA Certs
+
+- Typically you will need two CA certs if working as standard with GitHub: one for api.github.com, and one for objects.githubusercontent.com.
+- **Certificates expire!** They tend to last a while, these ones last until 2030, but that's something to be aware of. Once either certificate has expired your devices will not be able to perform OTA (until flashed with new certs) - this is something we're going to attempt to future-proof going forwards.
+- Plus, as we've experienced recently, certificates that are in date [might just stop working](https://news.ycombinator.com/item?id=35295216). In which case it's not a bad idea to either have a fallback option (we recommend [ElegantOTA](https://github.com/ayushsharma82/ElegantOTA) for local flashing) or to watch this space for our future proofing.
+- You can always set your own certs (should the default ones not work) via `wifi_client.setCACert(NEW CA CERT)` and `wifi_client.setCACert(NEW CA CERT)`.
+- Or you can set `wifi_client.setInsecure()` and remove the `setCACerts...`. This means that the ESP32 will not validate if the api.github.com and objects.githubusercontent.com have the correct CA Certs, so could technically open up security issues (although for hobbyist / non-critical projects this should be fine). 
 
 ## Compabibility and testing
 
