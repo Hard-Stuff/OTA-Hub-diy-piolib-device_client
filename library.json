@@ -1,6 +1,6 @@
 {
 	"name": "OTA-Hub-diy-device_client",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Client-side code for running Do-It-Yourself device updates via GitHub, by OTA Hub.",
 	"keywords": "http, ota, ota-hub, github",
 	"repository": {
