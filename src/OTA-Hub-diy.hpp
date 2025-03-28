@@ -179,12 +179,23 @@ namespace OTA
         if (response.success())
         {
             // Compile into a JSON doc
+#if ARDUINOJSON_VERSION_MAJOR >= 7
             JsonDocument release_response;
+#else
+            DynamicJsonDocument release_response(8129);
+#endif
             deserializeJson(release_response, response.body);
             if (
+#if ARDUINOJSON_VERSION_MAJOR >= 7
+                release_response["name"].isNull() ||
+                release_response["published_at"].isNull() ||
+                release_response["assets"].isNull()
+#else
                 !release_response.containsKey("name") ||
                 !release_response.containsKey("published_at") ||
-                !release_response.containsKey("assets"))
+                !release_response.containsKey("assets")
+#endif
+            )
             {
                 Serial.println("The latest release contains no assets and/or metadata. We can't continue...");
                 return return_object;
@@ -209,6 +220,9 @@ namespace OTA
                 }
             }
             Serial.println("The latest release contains no firmware asset. We can't continue...");
+#if ARDUINOJSON_VERSION_MAJOR < 7
+            release_response.clear();
+#endif
         }
 
         Serial.println("Failed to connect to GitHub. Check your OTAGH_... #defines.");
