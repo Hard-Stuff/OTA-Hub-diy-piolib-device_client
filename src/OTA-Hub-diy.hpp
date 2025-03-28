@@ -223,6 +223,7 @@ namespace OTA
 #if ARDUINOJSON_VERSION_MAJOR < 7
             release_response.clear();
 #endif
+            return return_object;
         }
 
         Serial.println("Failed to connect to GitHub. Check your OTAGH_... #defines.");
